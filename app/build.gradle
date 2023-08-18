@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -30,6 +32,9 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -41,4 +46,23 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'androidx.activity:activity-ktx:1.7.2'
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
+    androidTestImplementation 'com.squareup.retrofit2:retrofit-mock:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+
+    // Room Database
+    implementation "androidx.room:room-ktx:2.5.2"
+    kapt "androidx.room:room-compiler:2.5.2"
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:2.47"
+    kapt "com.google.dagger:hilt-compiler:2.47"
+
+    // Timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }

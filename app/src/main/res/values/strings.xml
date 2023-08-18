@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">The Null Pointer</string>
+    <string name="file_thumbnail">File thumbnail</string>
+    <string name="upload_file">Upload file</string>
+    <string name="uploaded_at">Uploaded: %1$s</string>
+    <string name="expires_in">Expires in %1$s day(s)</string>
+    <string name="share_file">Share file</string>
 </resources>
