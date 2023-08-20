@@ -1,19 +1,17 @@
 package volovyk.thenullpointer.ui
 
-import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -23,14 +21,15 @@ import timber.log.Timber
 import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import volovyk.thenullpointer.databinding.ActivityMainBinding
+import volovyk.thenullpointer.databinding.FileUploadSnackbarBinding
 import java.io.File
-import java.io.FileNotFoundException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
+    private lateinit var fileUploadSnackBarBinding: FileUploadSnackbarBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,42 +77,72 @@ class MainActivity : AppCompatActivity() {
                 }
         }
 
+        fileUploadSnackBarBinding = FileUploadSnackbarBinding.inflate(layoutInflater)
+
+        // create an instance of the snackbar
+        val fileUploadSnackbar = setupCustomSnackbar(binding.root, fileUploadSnackBarBinding.root)
+
         lifecycleScope.launch {
             viewModel.uiState
                 .map { it.fileUploadState }
                 .distinctUntilChanged()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { fileUploadState ->
-                    when (fileUploadState) {
-                        is FileUploadState.Success -> {
-                            Timber.d("File uploaded successfully!")
-                            binding.fileUploadProgressBar.isVisible = false
-                            Toast.makeText(
-                                this@MainActivity,
-                                R.string.file_uploaded_successfully,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        is FileUploadState.InProgress -> {
-                            Timber.d("File upload in progress: ${fileUploadState.progress}")
-                            binding.fileUploadProgressBar.isVisible = true
-                            binding.fileUploadProgressBar.progress = fileUploadState.progress
-                        }
-
-                        is FileUploadState.Failure -> {
-                            Timber.d("File upload failed! ${fileUploadState.message}")
-                            binding.fileUploadProgressBar.isVisible = false
-                            Toast.makeText(
-                                this@MainActivity,
-                                getString(R.string.file_upload_failure, fileUploadState.message),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        else -> {}
-                    }
+                    showFileUploadState(fileUploadState, fileUploadSnackbar)
                 }
+        }
+    }
+
+    private fun showFileUploadState(
+        fileUploadState: FileUploadState?,
+        fileUploadSnackbar: Snackbar
+    ) {
+        when (fileUploadState) {
+            is FileUploadState.Success -> {
+                Timber.d("File ${fileUploadState.filename} uploaded successfully!")
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(
+                        R.string.file_uploaded_successfully,
+                        fileUploadState.filename
+                    ),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            is FileUploadState.InProgress -> {
+                Timber.d("File ${fileUploadState.filename} upload in progress: ${fileUploadState.progress}")
+                when (fileUploadState.progress) {
+                    0 -> {
+                        fileUploadSnackBarBinding.uploadingFileNameTextView.text =
+                            getString(R.string.uploading_file, fileUploadState.filename)
+                        fileUploadSnackbar.show()
+                    }
+
+                    100 -> {
+                        fileUploadSnackbar.dismiss()
+                    }
+
+                    else -> {}
+                }
+                fileUploadSnackBarBinding.fileUploadProgressBar.progress =
+                    fileUploadState.progress
+            }
+
+            is FileUploadState.Failure -> {
+                Timber.d("File ${fileUploadState.filename} upload failed! ${fileUploadState.message}")
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(
+                        R.string.file_upload_failure,
+                        fileUploadState.filename,
+                        fileUploadState.message
+                    ),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            else -> {}
         }
     }
 
@@ -136,39 +165,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun Uri.length(contentResolver: ContentResolver): Long {
-
-        val assetFileDescriptor = try {
-            contentResolver.openAssetFileDescriptor(this, "r")
-        } catch (e: FileNotFoundException) {
-            null
-        }
-        // uses ParcelFileDescriptor#getStatSize underneath if failed
-        val length = assetFileDescriptor?.use { it.length } ?: -1L
-        if (length != -1L) {
-            return length
-        }
-
-        // if "content://" uri scheme, try contentResolver table
-        if (scheme.equals(ContentResolver.SCHEME_CONTENT)) {
-            return contentResolver.query(this, arrayOf(OpenableColumns.SIZE), null, null, null)
-                ?.use { cursor ->
-                    // maybe shouldn't trust ContentResolver for size: https://stackoverflow.com/questions/48302972/content-resolver-returns-wrong-size
-                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-                    if (sizeIndex == -1) {
-                        return@use -1L
-                    }
-                    cursor.moveToFirst()
-                    return try {
-                        cursor.getLong(sizeIndex)
-                    } catch (_: Throwable) {
-                        -1L
-                    }
-                } ?: -1L
-        } else {
-            return -1L
-        }
-    }
-
 }

@@ -27,8 +27,8 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
         val requestFile = ProgressEmittingRequestBody(fileSize, inputStream, mediaType)
 
         val progressJob = CoroutineScope(Dispatchers.IO).launch {
-            requestFile.progress.takeWhile { it != ProgressEmittingRequestBody.MAX_PROGRESS }.collect {
-                send(FileUploadState.InProgress(it))
+            requestFile.progress.takeWhile { it <= ProgressEmittingRequestBody.MAX_PROGRESS }.collect {
+                send(FileUploadState.InProgress(filename, it))
             }
         }
 
@@ -48,7 +48,7 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
             throw RuntimeException()
         }
 
-        send(FileUploadState.Success(fullFileUrl, fileToken, fileExpiresAt))
+        send(FileUploadState.Success(filename, fullFileUrl, fileToken, fileExpiresAt))
     }.flowOn(Dispatchers.IO)
 
 }
