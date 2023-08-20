@@ -1,10 +1,14 @@
 package volovyk.thenullpointer.data.remote.nullpointer
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import timber.log.Timber
 import volovyk.thenullpointer.data.remote.FileDatabase
-import volovyk.thenullpointer.data.remote.entity.FileUploadedResponse
+import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import java.io.InputStream
 import java.util.Date
 
@@ -13,10 +17,13 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
 
     override fun uploadFile(
         filename: String,
+        fileSize: Long,
         inputStream: InputStream,
         mediaType: MediaType
-    ): FileUploadedResponse {
-        val requestFile = InputStreamRequestBody(inputStream, mediaType)
+    ): Flow<FileUploadState> = flow {
+        val requestFile = ProgressEmittingRequestBody(fileSize, inputStream, mediaType)
+
+        emit(FileUploadState.InProgress(requestFile.progress))
 
         val body = MultipartBody.Part.createFormData("file", filename, requestFile)
 
@@ -32,7 +39,7 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
             throw RuntimeException()
         }
 
-        return FileUploadedResponse(fullFileUrl, fileToken, fileExpiresAt)
-    }
+        emit(FileUploadState.Success(fullFileUrl, fileToken, fileExpiresAt))
+    }.flowOn(Dispatchers.IO)
 
 }

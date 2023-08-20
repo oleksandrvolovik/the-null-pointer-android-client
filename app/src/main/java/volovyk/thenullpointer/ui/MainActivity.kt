@@ -1,11 +1,15 @@
 package volovyk.thenullpointer.ui
 
+import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,8 +19,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
+import volovyk.thenullpointer.R
+import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import volovyk.thenullpointer.databinding.ActivityMainBinding
 import java.io.File
+import java.io.FileNotFoundException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -69,6 +76,42 @@ class MainActivity : AppCompatActivity() {
                     fileListAdapter.submitList(files)
                 }
         }
+
+        lifecycleScope.launch {
+            viewModel.uiState
+                .map { it.fileUploadState }
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { fileUploadState ->
+                    when (fileUploadState) {
+                        is FileUploadState.Success -> {
+                            binding.fileUploadProgressBar.isVisible = false
+                            Toast.makeText(
+                                this@MainActivity,
+                                R.string.file_uploaded_successfully,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is FileUploadState.InProgress -> {
+                            binding.fileUploadProgressBar.isVisible = true
+                            fileUploadState.progress.collect {
+                                binding.fileUploadProgressBar.progress = it
+                            }
+                        }
+
+                        is FileUploadState.Failure -> {
+                            binding.fileUploadProgressBar.isVisible = false
+                            Toast.makeText(
+                                this@MainActivity,
+                                getString(R.string.file_upload_failure, fileUploadState.message),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        else -> {}
+                    }
+                }
+        }
     }
 
     private val openDocumentLauncher = registerForActivityResult<Array<String>, Uri>(
@@ -76,16 +119,52 @@ class MainActivity : AppCompatActivity() {
     ) { fileUri: Uri? ->
         fileUri?.let {
             val file = fileUri.path?.let { File(it) }
+            val fileSize = fileUri.length(contentResolver)
             val fileInputStream = contentResolver.openInputStream(fileUri)
             val mediaType = contentResolver.getType(fileUri)?.let { MediaType.parse(it) }
 
             if (file != null && fileInputStream != null && mediaType != null) {
                 viewModel.uploadFile(
                     file.name,
+                    fileSize,
                     fileInputStream,
                     mediaType
                 )
             }
+        }
+    }
+
+    private fun Uri.length(contentResolver: ContentResolver): Long {
+
+        val assetFileDescriptor = try {
+            contentResolver.openAssetFileDescriptor(this, "r")
+        } catch (e: FileNotFoundException) {
+            null
+        }
+        // uses ParcelFileDescriptor#getStatSize underneath if failed
+        val length = assetFileDescriptor?.use { it.length } ?: -1L
+        if (length != -1L) {
+            return length
+        }
+
+        // if "content://" uri scheme, try contentResolver table
+        if (scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+            return contentResolver.query(this, arrayOf(OpenableColumns.SIZE), null, null, null)
+                ?.use { cursor ->
+                    // maybe shouldn't trust ContentResolver for size: https://stackoverflow.com/questions/48302972/content-resolver-returns-wrong-size
+                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                    if (sizeIndex == -1) {
+                        return@use -1L
+                    }
+                    cursor.moveToFirst()
+                    return try {
+                        cursor.getLong(sizeIndex)
+                    } catch (_: Throwable) {
+                        -1L
+                    }
+                } ?: -1L
+        } else {
+            return -1L
         }
     }
 

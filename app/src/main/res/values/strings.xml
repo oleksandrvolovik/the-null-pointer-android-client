@@ -5,4 +5,7 @@
     <string name="uploaded_at">Uploaded: %1$s</string>
     <string name="expires_in">Expires in %1$s day(s)</string>
     <string name="share_file">Share file</string>
+    <string name="file_uploaded_successfully">File uploaded successfully!</string>
+    <string name="file_upload_in_progress">File upload in progress: %1$d%%</string>
+    <string name="file_upload_failure">File upload failure: %1$s</string>
 </resources>

@@ -2,11 +2,14 @@ package volovyk.thenullpointer.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.data.local.UploadedFileDatabase
 import volovyk.thenullpointer.data.remote.FileDatabase
+import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import java.io.InputStream
 import java.util.Date
 
@@ -20,19 +23,31 @@ class FileRepositoryImpl(
     override fun getFilesFlow(): Flow<List<UploadedFile>> =
         uploadedFileDao.getAll()
 
-    override suspend fun uploadFile(filename: String, inputStream: InputStream, mediaType: MediaType) {
-        withContext(Dispatchers.IO) {
-            val fileUploadedResponse = fileDatabase.uploadFile(filename, inputStream, mediaType)
+    override suspend fun uploadFile(
+        filename: String,
+        fileSize: Long,
+        inputStream: InputStream,
+        mediaType: MediaType
+    ): Flow<FileUploadState> {
+        return withContext(Dispatchers.IO) {
+            val fileUploadState =
+                fileDatabase.uploadFile(filename, fileSize, inputStream, mediaType)
 
-            val uploadedFile = UploadedFile(
-                filename,
-                fileUploadedResponse.token,
-                fileUploadedResponse.url,
-                Date(),
-                fileUploadedResponse.expiresAt
-            )
+            val realFileUploadState = fileUploadState.onEach {
+                if (it is FileUploadState.Success) {
+                    val uploadedFile = UploadedFile(
+                        filename,
+                        it.token,
+                        it.url,
+                        Date(),
+                        it.expiresAt
+                    )
 
-            uploadedFileDao.insert(uploadedFile)
+                    uploadedFileDao.insert(uploadedFile)
+                }
+            }.flowOn(Dispatchers.IO)
+
+            realFileUploadState
         }
     }
 }
