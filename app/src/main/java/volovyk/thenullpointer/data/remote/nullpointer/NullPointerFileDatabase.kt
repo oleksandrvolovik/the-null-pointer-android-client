@@ -1,9 +1,12 @@
 package volovyk.thenullpointer.data.remote.nullpointer
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import timber.log.Timber
@@ -20,14 +23,20 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
         fileSize: Long,
         inputStream: InputStream,
         mediaType: MediaType
-    ): Flow<FileUploadState> = flow {
+    ): Flow<FileUploadState> = channelFlow {
         val requestFile = ProgressEmittingRequestBody(fileSize, inputStream, mediaType)
 
-        emit(FileUploadState.InProgress(requestFile.progress))
+        val progressJob = CoroutineScope(Dispatchers.IO).launch {
+            requestFile.progress.takeWhile { it != ProgressEmittingRequestBody.MAX_PROGRESS }.collect {
+                send(FileUploadState.InProgress(it))
+            }
+        }
 
         val body = MultipartBody.Part.createFormData("file", filename, requestFile)
 
         val response = nullPointerApiInterface.postFile(body).execute()
+
+        progressJob.cancel() // Cancel the progress collection job
 
         val fileUrl = response.body()?.trim()
         val fullFileUrl = "$fileUrl/$filename"
@@ -39,7 +48,7 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
             throw RuntimeException()
         }
 
-        emit(FileUploadState.Success(fullFileUrl, fileToken, fileExpiresAt))
+        send(FileUploadState.Success(fullFileUrl, fileToken, fileExpiresAt))
     }.flowOn(Dispatchers.IO)
 
 }

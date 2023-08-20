@@ -1,6 +1,5 @@
 package volovyk.thenullpointer.data.remote.entity
 
-import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 
 sealed class FileUploadState {
@@ -11,7 +10,7 @@ sealed class FileUploadState {
     ) : FileUploadState()
 
     data class InProgress(
-        val progress: StateFlow<Int>
+        val progress: Int
     ) : FileUploadState()
 
     data class Failure(

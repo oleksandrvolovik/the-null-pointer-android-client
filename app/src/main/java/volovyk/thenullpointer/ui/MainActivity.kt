@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
+import timber.log.Timber
 import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import volovyk.thenullpointer.databinding.ActivityMainBinding
@@ -80,10 +81,12 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState
                 .map { it.fileUploadState }
+                .distinctUntilChanged()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { fileUploadState ->
                     when (fileUploadState) {
                         is FileUploadState.Success -> {
+                            Timber.d("File uploaded successfully!")
                             binding.fileUploadProgressBar.isVisible = false
                             Toast.makeText(
                                 this@MainActivity,
@@ -93,13 +96,13 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         is FileUploadState.InProgress -> {
+                            Timber.d("File upload in progress: ${fileUploadState.progress}")
                             binding.fileUploadProgressBar.isVisible = true
-                            fileUploadState.progress.collect {
-                                binding.fileUploadProgressBar.progress = it
-                            }
+                            binding.fileUploadProgressBar.progress = fileUploadState.progress
                         }
 
                         is FileUploadState.Failure -> {
+                            Timber.d("File upload failed! ${fileUploadState.message}")
                             binding.fileUploadProgressBar.isVisible = false
                             Toast.makeText(
                                 this@MainActivity,

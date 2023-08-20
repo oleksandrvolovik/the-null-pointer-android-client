@@ -14,7 +14,7 @@ class ProgressEmittingRequestBody(
     private val mediaType: MediaType
 ) : RequestBody() {
 
-    private val _progress = MutableStateFlow(0)
+    private val _progress = MutableStateFlow(MIN_PROGRESS)
     val progress: StateFlow<Int> = _progress
 
     override fun contentType(): MediaType = mediaType
@@ -48,5 +48,7 @@ class ProgressEmittingRequestBody(
 
     companion object {
         const val BUFFER_SIZE = 1024
+        const val MIN_PROGRESS = 0
+        const val MAX_PROGRESS = 100
     }
 }
