@@ -7,6 +7,8 @@ import android.provider.OpenableColumns
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import java.io.FileNotFoundException
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 fun Uri.length(contentResolver: ContentResolver): Long {
 
@@ -57,4 +59,12 @@ fun setupCustomSnackbar(parentView: View, customView: View): Snackbar {
     // add the custom snack bar layout to snackbar layout
     snackbarLayout.addView(customView, 0)
     return snackbar
+}
+
+fun Date.getDaysDifference(otherDate: Date): Long {
+    // Calculate the time difference in milliseconds
+    val timeDifferenceInMillis = otherDate.time - this.time
+
+    // Convert the time difference from milliseconds to days
+    return TimeUnit.MILLISECONDS.toDays(timeDifferenceInMillis)
 }

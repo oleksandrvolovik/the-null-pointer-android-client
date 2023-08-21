@@ -10,7 +10,6 @@ import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.databinding.FragmentFileListItemBinding
 import java.util.Date
-import java.util.concurrent.TimeUnit
 
 class FileListAdapter(
     private val onItemClick: (UploadedFile) -> Unit,
@@ -36,7 +35,7 @@ class FileListAdapter(
                     )
                 expiresInTextView.text = context.getString(
                     R.string.expires_in,
-                    getDaysDifference(uploadedFile.expiresAt).toString()
+                    Date().getDaysDifference(uploadedFile.expiresAt).toString()
                 )
                 cardView.setOnClickListener { onItemClick(uploadedFile) }
                 cardView.setOnLongClickListener {
@@ -67,17 +66,4 @@ class FileListAdapter(
 
     override fun onBindViewHolder(holder: UploadedFileViewHolder, position: Int) =
         holder.bind(getItem(position))
-
-    companion object {
-        private fun getDaysDifference(date: Date): Long {
-            // Get the current date and time
-            val currentDate = Date()
-
-            // Calculate the time difference in milliseconds
-            val timeDifferenceInMillis = date.time - currentDate.time
-
-            // Convert the time difference from milliseconds to days
-            return TimeUnit.MILLISECONDS.toDays(timeDifferenceInMillis)
-        }
-    }
 }
