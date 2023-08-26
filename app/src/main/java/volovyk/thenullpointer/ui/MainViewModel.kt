@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
+import timber.log.Timber
 import volovyk.thenullpointer.data.FileRepository
 import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 data class MainUiState(
     val files: List<UploadedFile> = emptyList(),
-    val fileUploadState: FileUploadState? = null
+    val fileUploadState: List<FileUploadState> = emptyList()
 )
 
 @HiltViewModel
@@ -24,6 +25,8 @@ class MainViewModel @Inject constructor(private val fileRepository: FileReposito
 
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState
+
+    private val fileUploadStateMap = mutableMapOf<String, FileUploadState>()
 
     init {
         viewModelScope.launch {
@@ -44,10 +47,15 @@ class MainViewModel @Inject constructor(private val fileRepository: FileReposito
         viewModelScope.launch {
             fileRepository.uploadFile(filename, fileSize, inputStream, mediaType)
                 .collect { fileUploadState ->
-                    _uiState.update {
-                        it.copy(fileUploadState = fileUploadState)
-                    }
+                    Timber.d("New file upload state: $fileUploadState")
+                    fileUploadStateMap[filename] = fileUploadState
+                    _uiState.update { it.copy(fileUploadState = fileUploadStateMap.values.toList()) }
                 }
         }
+    }
+
+    fun fileUploadResultShown(fileUploadState: FileUploadState) {
+        fileUploadStateMap.remove(fileUploadState.filename)
+        _uiState.update { it.copy(fileUploadState = fileUploadStateMap.values.toList()) }
     }
 }

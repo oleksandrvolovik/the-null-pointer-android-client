@@ -3,25 +3,20 @@ package volovyk.thenullpointer.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import timber.log.Timber
-import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import volovyk.thenullpointer.databinding.ActivityMainBinding
-import volovyk.thenullpointer.databinding.FileUploadSnackbarBinding
 import java.io.File
 
 @AndroidEntryPoint
@@ -29,7 +24,6 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var fileUploadSnackBarBinding: FileUploadSnackbarBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +51,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        binding.fileRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = fileListAdapter
-        }
+        binding.fileRecyclerView.adapter = fileListAdapter
 
         binding.fileUploadButton.setOnClickListener {
             val mimetypes = arrayOf("*/*")
@@ -77,79 +68,31 @@ class MainActivity : AppCompatActivity() {
                 }
         }
 
-        fileUploadSnackBarBinding = FileUploadSnackbarBinding.inflate(layoutInflater)
-
-        // create an instance of the snackbar
-        val fileUploadSnackbar = setupCustomSnackbar(binding.root, fileUploadSnackBarBinding.root)
+        val fileUploadStateListAdapter = FileUploadStateListAdapter(
+            onItemClick = {
+                if (it !is FileUploadState.InProgress) {
+                    viewModel.fileUploadResultShown(it)
+                }
+            }
+        )
+        val fileUploadStateRecyclerView = binding.fileUploadStateList
+        fileUploadStateRecyclerView.adapter = fileUploadStateListAdapter
 
         lifecycleScope.launch {
             viewModel.uiState
                 .map { it.fileUploadState }
-                .distinctUntilChanged()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { fileUploadState ->
-                    showFileUploadState(fileUploadState, fileUploadSnackbar)
+                    Timber.d("New file upload state: $fileUploadState")
+                    fileUploadStateListAdapter.submitList(fileUploadState)
                 }
         }
     }
 
-    private fun showFileUploadState(
-        fileUploadState: FileUploadState?,
-        fileUploadSnackbar: Snackbar
-    ) {
-        when (fileUploadState) {
-            is FileUploadState.Success -> {
-                Timber.d("File ${fileUploadState.filename} uploaded successfully!")
-                Toast.makeText(
-                    this@MainActivity,
-                    getString(
-                        R.string.file_uploaded_successfully,
-                        fileUploadState.filename
-                    ),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            is FileUploadState.InProgress -> {
-                Timber.d("File ${fileUploadState.filename} upload in progress: ${fileUploadState.progress}")
-                when (fileUploadState.progress) {
-                    0 -> {
-                        fileUploadSnackBarBinding.uploadingFileNameTextView.text =
-                            getString(R.string.uploading_file, fileUploadState.filename)
-                        fileUploadSnackbar.show()
-                    }
-
-                    100 -> {
-                        fileUploadSnackbar.dismiss()
-                    }
-
-                    else -> {}
-                }
-                fileUploadSnackBarBinding.fileUploadProgressBar.progress =
-                    fileUploadState.progress
-            }
-
-            is FileUploadState.Failure -> {
-                Timber.d("File ${fileUploadState.filename} upload failed! ${fileUploadState.message}")
-                Toast.makeText(
-                    this@MainActivity,
-                    getString(
-                        R.string.file_upload_failure,
-                        fileUploadState.filename,
-                        fileUploadState.message
-                    ),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            else -> {}
-        }
-    }
-
-    private val openDocumentLauncher = registerForActivityResult<Array<String>, Uri>(
-        ActivityResultContracts.OpenDocument()
-    ) { fileUri: Uri? ->
-        fileUri?.let {
+    private val openDocumentLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { files: List<Uri> ->
+        files.forEach { fileUri ->
             val file = fileUri.path?.let { File(it) }
             val fileSize = fileUri.length(contentResolver)
             val fileInputStream = contentResolver.openInputStream(fileUri)

@@ -1,11 +1,8 @@
 package volovyk.thenullpointer.ui
 
 import android.content.ContentResolver
-import android.graphics.Color
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.view.View
-import com.google.android.material.snackbar.Snackbar
 import java.io.FileNotFoundException
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -42,23 +39,6 @@ fun Uri.length(contentResolver: ContentResolver): Long {
     } else {
         return -1L
     }
-}
-
-fun setupCustomSnackbar(parentView: View, customView: View): Snackbar {
-    val snackbar = Snackbar.make(parentView, "", Snackbar.LENGTH_INDEFINITE)
-
-    // set the background of the default snackbar as transparent
-    snackbar.view.setBackgroundColor(Color.TRANSPARENT)
-
-    // now change the layout of the snackbar
-    val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
-
-    // set padding of the all corners as 0
-    snackbarLayout.setPadding(0, 0, 0, 0)
-
-    // add the custom snack bar layout to snackbar layout
-    snackbarLayout.addView(customView, 0)
-    return snackbar
 }
 
 fun Date.getDaysDifference(otherDate: Date): Long {
