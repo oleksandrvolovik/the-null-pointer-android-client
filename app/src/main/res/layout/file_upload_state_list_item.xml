@@ -26,6 +26,7 @@
             android:id="@+id/file_upload_progress_bar"
             android:layout_width="match_parent"
             android:layout_height="32dp"
+            tools:progress="30"
             android:layout_margin="@dimen/default_margin"
             android:max="100"
             app:layout_constraintBottom_toBottomOf="parent"
