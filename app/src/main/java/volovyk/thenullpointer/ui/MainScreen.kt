@@ -32,7 +32,7 @@ fun MainScreen(
             }
 
             // Display "Upload file" FAB
-            MyFloatingActionButton(
+            UploadFileFab(
                 onClick = onUploadFileFabClick
             )
         }

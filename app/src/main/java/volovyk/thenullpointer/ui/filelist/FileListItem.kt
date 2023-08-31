@@ -17,10 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.entity.UploadedFile
+import volovyk.thenullpointer.ui.getDaysDifference
 import java.util.Date
 
 @Composable
@@ -55,13 +58,16 @@ fun FileListItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Uploaded at: ${file.uploadedAt}",
+                    text = stringResource(id = R.string.uploaded_at, file.uploadedAt),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Expires in: ${file.expiresAt}",
+                    text = stringResource(
+                        R.string.expires_in,
+                        Date().getDaysDifference(file.expiresAt).toString()
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -70,7 +76,7 @@ fun FileListItem(
             IconButton(onClick = { onShareButtonClick(file) }) {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_menu_share),
-                    contentDescription = "Share File",
+                    contentDescription = stringResource(id = R.string.share_file),
                     tint = LocalContentColor.current
                 )
             }

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import volovyk.thenullpointer.R
 
 @Composable
-fun MyFloatingActionButton(
+fun UploadFileFab(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
@@ -32,5 +32,5 @@ fun MyFloatingActionButton(
 @Composable
 @Preview(showBackground = true)
 fun MyFloatingActionButtonPreview() {
-    MyFloatingActionButton(onClick = { /* Handle FAB click */ })
+    UploadFileFab(onClick = { /* Handle FAB click */ })
 }
