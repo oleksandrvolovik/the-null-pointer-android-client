@@ -41,6 +41,14 @@ fun Uri.length(contentResolver: ContentResolver): Long {
     }
 }
 
+fun Uri.getFileName(contentResolver: ContentResolver): String? {
+    return contentResolver.query(this, null, null, null, null)?.use { cursor ->
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        cursor.moveToFirst()
+        cursor.getString(nameIndex)
+    }
+}
+
 fun Date.getDaysDifference(otherDate: Date): Long {
     // Calculate the time difference in milliseconds
     val timeDifferenceInMillis = otherDate.time - this.time

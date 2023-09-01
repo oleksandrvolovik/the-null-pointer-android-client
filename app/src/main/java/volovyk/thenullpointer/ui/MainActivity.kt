@@ -65,14 +65,14 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.OpenMultipleDocuments()
     ) { files: List<Uri> ->
         files.forEach { fileUri ->
-            val file = fileUri.path?.let { File(it) }
+            val filename = fileUri.getFileName(contentResolver)
             val fileSize = fileUri.length(contentResolver)
             val fileInputStream = contentResolver.openInputStream(fileUri)
             val mediaType = contentResolver.getType(fileUri)?.let { MediaType.parse(it) }
 
-            if (file != null && fileInputStream != null && mediaType != null) {
+            if (filename != null && fileInputStream != null && mediaType != null) {
                 viewModel.uploadFile(
-                    file.name,
+                    filename,
                     fileSize,
                     fileInputStream,
                     mediaType
