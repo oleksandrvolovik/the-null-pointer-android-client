@@ -9,4 +9,5 @@
     <string name="file_upload_in_progress">File upload in progress: %1$d%%</string>
     <string name="uploading_file">Uploading: %1$s</string>
     <string name="file_upload_failure">File %1$s upload failed: %2$s</string>
+    <string name="file_already_being_uploaded">This file is already being uploaded!</string>
 </resources>

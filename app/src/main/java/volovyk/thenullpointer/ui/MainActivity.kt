@@ -3,6 +3,7 @@ package volovyk.thenullpointer.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,9 +16,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MediaType
+import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import volovyk.thenullpointer.ui.theme.AppTheme
-import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -71,12 +72,16 @@ class MainActivity : ComponentActivity() {
             val mediaType = contentResolver.getType(fileUri)?.let { MediaType.parse(it) }
 
             if (filename != null && fileInputStream != null && mediaType != null) {
-                viewModel.uploadFile(
-                    filename,
-                    fileSize,
-                    fileInputStream,
-                    mediaType
-                )
+                if (filename !in viewModel.uiState.value.fileUploadState.map { it.filename }) {
+                    viewModel.uploadFile(
+                        filename,
+                        fileSize,
+                        fileInputStream,
+                        mediaType
+                    )
+                } else {
+                    Toast.makeText(this, R.string.file_already_being_uploaded, Toast.LENGTH_SHORT)
+                }
             }
         }
     }
