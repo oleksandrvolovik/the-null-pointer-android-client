@@ -6,6 +6,7 @@
     <string name="expires_in">Expires in %1$s day(s)</string>
     <string name="share_file">Share file</string>
     <string name="file_uploaded_successfully">File %1$s uploaded successfully!</string>
+    <string name="file_uploaded_already_exists">File %1$s already exists on The Null Pointer</string>
     <string name="file_upload_in_progress">File upload in progress: %1$d%%</string>
     <string name="uploading_file">Uploading: %1$s</string>
     <string name="file_upload_failure">File %1$s upload failed: %2$s</string>

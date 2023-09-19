@@ -76,7 +76,11 @@ fun FileUploadStateListItem(
                 is FileUploadState.Success -> {
                     Text(
                         text = stringResource(
-                            id = R.string.file_uploaded_successfully,
+                            id = if (fileUploadState.token != null) {
+                                R.string.file_uploaded_successfully
+                            } else {
+                                R.string.file_uploaded_already_exists
+                            },
                             fileUploadState.filename
                         ),
                         fontSize = 16.sp,
