@@ -54,6 +54,12 @@ class MainViewModel @Inject constructor(private val fileRepository: FileReposito
         }
     }
 
+    fun deleteFile(file: UploadedFile) {
+        viewModelScope.launch {
+            fileRepository.deleteFile(file)
+        }
+    }
+
     fun fileUploadResultShown(fileUploadState: FileUploadState) {
         fileUploadStateMap.remove(fileUploadState.filename)
         _uiState.update { it.copy(fileUploadState = fileUploadStateMap.values.toList()) }

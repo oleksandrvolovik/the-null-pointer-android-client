@@ -14,4 +14,6 @@ interface FileRepository {
         inputStream: InputStream,
         mediaType: MediaType
     ): Flow<FileUploadState>
+
+    suspend fun deleteFile(file: UploadedFile)
 }

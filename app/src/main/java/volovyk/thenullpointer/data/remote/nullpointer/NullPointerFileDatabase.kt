@@ -9,11 +9,13 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import timber.log.Timber
 import volovyk.thenullpointer.data.remote.FileDatabase
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import java.io.InputStream
 import java.util.Date
+
 
 class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerApiInterface) :
     FileDatabase {
@@ -51,4 +53,16 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
         send(FileUploadState.Success(filename, fullFileUrl, fileToken, fileExpiresAt))
     }.flowOn(Dispatchers.IO)
 
+    override fun deleteFile(link: String, token: String) {
+        val requestBody: RequestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("token", token)
+            .addFormDataPart("delete", "")
+            .build()
+
+        // https://0x0.st/HOvW.zip/testfile.zip -> HOvW.zip
+        val filename = link.substringBeforeLast("/").substringAfterLast("/")
+
+        nullPointerApiInterface.deleteFile(filename, requestBody).execute()
+    }
 }

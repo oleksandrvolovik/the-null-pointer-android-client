@@ -47,6 +47,9 @@ class MainActivity : ComponentActivity() {
                             val shareIntent = Intent.createChooser(sendIntent, null)
                             startActivity(shareIntent)
                         },
+                        onDeleteButtonClick = {
+                            viewModel.deleteFile(it)
+                        },
                         onUploadFileFabClick = {
                             val mimetypes = arrayOf("*/*")
                             openDocumentLauncher.launch(mimetypes)

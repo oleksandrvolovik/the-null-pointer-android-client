@@ -12,4 +12,9 @@ interface FileDatabase {
         inputStream: InputStream,
         mediaType: MediaType
     ): Flow<FileUploadState>
+
+    fun deleteFile(
+        link: String,
+        token: String
+    )
 }

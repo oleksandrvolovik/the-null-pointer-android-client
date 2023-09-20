@@ -8,12 +8,17 @@ import volovyk.thenullpointer.data.entity.UploadedFile
 import java.util.Date
 
 @Composable
-fun FileList(files: List<UploadedFile>, onItemShareButtonClick: (UploadedFile) -> Unit) {
+fun FileList(
+    files: List<UploadedFile>,
+    onItemShareButtonClick: (UploadedFile) -> Unit,
+    onItemDeleteButtonClick: (UploadedFile) -> Unit
+) {
     LazyColumn {
         items(files) { file ->
             FileListItem(
                 file = file,
-                onShareButtonClick = onItemShareButtonClick
+                onShareButtonClick = onItemShareButtonClick,
+                onDeleteButtonClick = onItemDeleteButtonClick
             )
         }
     }
@@ -29,7 +34,8 @@ fun FileListPreview() {
             UploadedFile("File3.jpg", null, "link", Date(), Date()),
             UploadedFile("File4.avi", null, "link", Date(), Date())
         ),
-        onItemShareButtonClick = {}
+        onItemShareButtonClick = {},
+        onItemDeleteButtonClick = {}
     )
 }
 

@@ -18,6 +18,7 @@ import java.util.Date
 fun MainScreen(
     uiState: MainUiState,
     onShareButtonClick: (UploadedFile) -> Unit,
+    onDeleteButtonClick: (UploadedFile) -> Unit,
     onUploadFileFabClick: () -> Unit,
     onFileUploadStateClick: (FileUploadState) -> Unit
 ) {
@@ -28,6 +29,7 @@ fun MainScreen(
                 FileList(
                     files = uiState.files,
                     onItemShareButtonClick = onShareButtonClick,
+                    onItemDeleteButtonClick = onDeleteButtonClick
                 )
             }
 
@@ -61,7 +63,7 @@ fun MainScreenPreview() {
                     FileUploadState.InProgress("file6.mp3", 67),
                     FileUploadState.Failure("file7.png", "Something went wrong!", null)
                 )
-            ), {}, {}, {}
+            ), {}, {}, {}, {}
         )
     }
 }
