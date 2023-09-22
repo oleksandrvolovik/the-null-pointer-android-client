@@ -13,10 +13,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MediaType
 import volovyk.thenullpointer.R
+import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
 import volovyk.thenullpointer.ui.theme.AppTheme
 
@@ -35,6 +39,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val uiState by viewModel.uiState.collectAsState()
+                    val fileDeletionDialogOpen = remember { mutableStateOf(false) }
+                    val fileToBeDeleted = remember { mutableStateOf<UploadedFile?>(null) }
                     MainScreen(
                         uiState = uiState,
                         onShareButtonClick = {
@@ -48,7 +54,8 @@ class MainActivity : ComponentActivity() {
                             startActivity(shareIntent)
                         },
                         onDeleteButtonClick = {
-                            viewModel.deleteFile(it)
+                            fileDeletionDialogOpen.value = true
+                            fileToBeDeleted.value = it
                         },
                         onUploadFileFabClick = {
                             val mimetypes = arrayOf("*/*")
@@ -60,6 +67,18 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     )
+                    ConfirmationDialog(
+                        shown = fileDeletionDialogOpen.value,
+                        title = stringResource(id = R.string.confirm),
+                        description = stringResource(
+                            id = R.string.confirm_file_deletion,
+                            fileToBeDeleted.value?.name ?: ""
+                        ),
+                        onConfirm = {
+                            fileToBeDeleted.value?.let { viewModel.deleteFile(it) }
+                            fileDeletionDialogOpen.value = false
+                        },
+                        onDismiss = { fileDeletionDialogOpen.value = false })
                 }
             }
         }

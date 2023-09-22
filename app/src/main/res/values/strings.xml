@@ -11,4 +11,7 @@
     <string name="uploading_file">Uploading: %1$s</string>
     <string name="file_upload_failure">File %1$s upload failed: %2$s</string>
     <string name="file_already_being_uploaded">This file is already being uploaded!</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="confirm_file_deletion">Are you sure you want to delete %1$s ?</string>
 </resources>
