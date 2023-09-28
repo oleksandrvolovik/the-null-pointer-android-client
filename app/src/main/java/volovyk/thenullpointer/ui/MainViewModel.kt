@@ -12,6 +12,7 @@ import timber.log.Timber
 import volovyk.thenullpointer.data.FileRepository
 import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.data.remote.entity.FileUploadState
+import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -56,7 +57,11 @@ class MainViewModel @Inject constructor(private val fileRepository: FileReposito
 
     fun deleteFile(file: UploadedFile) {
         viewModelScope.launch {
-            fileRepository.deleteFile(file)
+            try {
+                fileRepository.deleteFile(file)
+            } catch (e: IOException) {
+                Timber.e(e)
+            }
         }
     }
 

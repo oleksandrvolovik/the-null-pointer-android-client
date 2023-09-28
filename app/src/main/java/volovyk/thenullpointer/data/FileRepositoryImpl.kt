@@ -53,10 +53,10 @@ class FileRepositoryImpl(
 
     override suspend fun deleteFile(file: UploadedFile) {
         withContext(Dispatchers.IO) {
+            uploadedFileDao.delete(file)
             file.token?.let {
                 fileDatabase.deleteFile(file.link, it)
             }
-            uploadedFileDao.delete(file)
         }
     }
 }
