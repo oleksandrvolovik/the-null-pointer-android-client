@@ -93,7 +93,7 @@ fun FileUploadStateListItem(
                         text = stringResource(
                             id = R.string.file_upload_failure,
                             fileUploadState.filename,
-                            fileUploadState.message ?: ""
+                            fileUploadState.message ?: stringResource(R.string.common_error_message)
                         ),
                         fontSize = 16.sp,
                         color = Color.Red
