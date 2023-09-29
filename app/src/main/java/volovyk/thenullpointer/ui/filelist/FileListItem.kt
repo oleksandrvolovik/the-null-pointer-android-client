@@ -38,6 +38,7 @@ import java.util.Date
 @Composable
 fun FileListItem(
     file: UploadedFile,
+    onClick: (UploadedFile) -> Unit,
     onShareButtonClick: (UploadedFile) -> Unit,
     onDeleteButtonClick: (UploadedFile) -> Unit
 ) {
@@ -48,7 +49,7 @@ fun FileListItem(
             .padding(8.dp)
             .clip(RoundedCornerShape(8.dp))
             .combinedClickable(
-                onClick = {},
+                onClick = { onClick(file) },
                 onLongClick = { contextMenuExpanded = true }
             ),
         elevation = CardDefaults.cardElevation(
@@ -60,7 +61,7 @@ fun FileListItem(
             onDismissRequest = { contextMenuExpanded = false }
         ) {
             DropdownMenuItem(
-                text = {  Text("Delete") },
+                text = { Text("Delete") },
                 onClick = {
                     onDeleteButtonClick(file)
                     contextMenuExpanded = false
@@ -118,6 +119,7 @@ fun FileListItemPreview() {
         file = UploadedFile(
             "file123.xyz", null, "", Date(), Date()
         ),
+        onClick = {},
         onShareButtonClick = {},
         onDeleteButtonClick = {}
     )

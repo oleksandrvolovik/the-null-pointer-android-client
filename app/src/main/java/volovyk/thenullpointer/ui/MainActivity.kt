@@ -1,5 +1,7 @@
 package volovyk.thenullpointer.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -43,6 +45,9 @@ class MainActivity : ComponentActivity() {
                     val fileToBeDeleted = remember { mutableStateOf<UploadedFile?>(null) }
                     MainScreen(
                         uiState = uiState,
+                        onFileClick = {
+                            copyLinkToClipboard(it.link)
+                        },
                         onShareButtonClick = {
                             val sendIntent: Intent = Intent().apply {
                                 action = Intent.ACTION_SEND
@@ -82,6 +87,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun copyLinkToClipboard(link: String) {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText(getString(R.string.app_name), link)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this, R.string.link_in_clipboard, Toast.LENGTH_SHORT).show()
     }
 
     private val openDocumentLauncher = registerForActivityResult(

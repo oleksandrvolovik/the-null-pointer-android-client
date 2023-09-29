@@ -10,6 +10,7 @@ import java.util.Date
 @Composable
 fun FileList(
     files: List<UploadedFile>,
+    onItemClick: (UploadedFile) -> Unit,
     onItemShareButtonClick: (UploadedFile) -> Unit,
     onItemDeleteButtonClick: (UploadedFile) -> Unit
 ) {
@@ -17,6 +18,7 @@ fun FileList(
         items(files) { file ->
             FileListItem(
                 file = file,
+                onClick = onItemClick,
                 onShareButtonClick = onItemShareButtonClick,
                 onDeleteButtonClick = onItemDeleteButtonClick
             )
@@ -34,6 +36,7 @@ fun FileListPreview() {
             UploadedFile("File3.jpg", null, "link", Date(), Date()),
             UploadedFile("File4.avi", null, "link", Date(), Date())
         ),
+        onItemClick = {},
         onItemShareButtonClick = {},
         onItemDeleteButtonClick = {}
     )

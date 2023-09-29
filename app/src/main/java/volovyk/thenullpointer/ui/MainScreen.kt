@@ -17,6 +17,7 @@ import java.util.Date
 @Composable
 fun MainScreen(
     uiState: MainUiState,
+    onFileClick: (UploadedFile) -> Unit,
     onShareButtonClick: (UploadedFile) -> Unit,
     onDeleteButtonClick: (UploadedFile) -> Unit,
     onUploadFileFabClick: () -> Unit,
@@ -28,6 +29,7 @@ fun MainScreen(
             Box(modifier = Modifier.weight(1f)) {
                 FileList(
                     files = uiState.files,
+                    onItemClick = onFileClick,
                     onItemShareButtonClick = onShareButtonClick,
                     onItemDeleteButtonClick = onDeleteButtonClick
                 )
@@ -63,7 +65,7 @@ fun MainScreenPreview() {
                     FileUploadState.InProgress("file6.mp3", 67),
                     FileUploadState.Failure("file7.png", "Something went wrong!", null)
                 )
-            ), {}, {}, {}, {}
+            ), {}, {}, {}, {}, {}
         )
     }
 }
