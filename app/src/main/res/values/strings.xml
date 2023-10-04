@@ -16,4 +16,6 @@
     <string name="confirm_file_deletion">Are you sure you want to delete %1$s ?</string>
     <string name="common_error_message">Something went wrong!</string>
     <string name="link_in_clipboard">Link copied to clipboard!</string>
+    <string name="delete">Delete</string>
+    <string name="open_in_browser">Open in Browser</string>
 </resources>

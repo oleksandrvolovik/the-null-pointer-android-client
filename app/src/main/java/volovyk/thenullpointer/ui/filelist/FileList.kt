@@ -12,6 +12,7 @@ fun FileList(
     files: List<UploadedFile>,
     onItemClick: (UploadedFile) -> Unit,
     onItemShareButtonClick: (UploadedFile) -> Unit,
+    onItemOpenButtonClick: (UploadedFile) -> Unit,
     onItemDeleteButtonClick: (UploadedFile) -> Unit
 ) {
     LazyColumn {
@@ -20,6 +21,7 @@ fun FileList(
                 file = file,
                 onClick = onItemClick,
                 onShareButtonClick = onItemShareButtonClick,
+                onOpenButtonClick = onItemOpenButtonClick,
                 onDeleteButtonClick = onItemDeleteButtonClick
             )
         }
@@ -38,6 +40,7 @@ fun FileListPreview() {
         ),
         onItemClick = {},
         onItemShareButtonClick = {},
+        onItemOpenButtonClick = {},
         onItemDeleteButtonClick = {}
     )
 }

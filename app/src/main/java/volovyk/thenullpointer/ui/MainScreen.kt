@@ -19,6 +19,7 @@ fun MainScreen(
     uiState: MainUiState,
     onFileClick: (UploadedFile) -> Unit,
     onShareButtonClick: (UploadedFile) -> Unit,
+    onOpenButtonClick: (UploadedFile) -> Unit,
     onDeleteButtonClick: (UploadedFile) -> Unit,
     onUploadFileFabClick: () -> Unit,
     onFileUploadStateClick: (FileUploadState) -> Unit
@@ -31,6 +32,7 @@ fun MainScreen(
                     files = uiState.files,
                     onItemClick = onFileClick,
                     onItemShareButtonClick = onShareButtonClick,
+                    onItemOpenButtonClick = onOpenButtonClick,
                     onItemDeleteButtonClick = onDeleteButtonClick
                 )
             }
@@ -65,7 +67,7 @@ fun MainScreenPreview() {
                     FileUploadState.InProgress("file6.mp3", 67),
                     FileUploadState.Failure("file7.png", "Something went wrong!", null)
                 )
-            ), {}, {}, {}, {}, {}
+            ), {}, {}, {}, {}, {}, {}
         )
     }
 }

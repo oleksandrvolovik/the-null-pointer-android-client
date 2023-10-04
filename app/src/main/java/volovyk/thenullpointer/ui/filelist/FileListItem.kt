@@ -40,6 +40,7 @@ fun FileListItem(
     file: UploadedFile,
     onClick: (UploadedFile) -> Unit,
     onShareButtonClick: (UploadedFile) -> Unit,
+    onOpenButtonClick: (UploadedFile) -> Unit,
     onDeleteButtonClick: (UploadedFile) -> Unit
 ) {
     var contextMenuExpanded by remember { mutableStateOf(false) }
@@ -61,7 +62,14 @@ fun FileListItem(
             onDismissRequest = { contextMenuExpanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Delete") },
+                text = { Text(stringResource(R.string.open_in_browser)) },
+                onClick = {
+                    onOpenButtonClick(file)
+                    contextMenuExpanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) },
                 onClick = {
                     onDeleteButtonClick(file)
                     contextMenuExpanded = false
@@ -121,6 +129,7 @@ fun FileListItemPreview() {
         ),
         onClick = {},
         onShareButtonClick = {},
+        onOpenButtonClick = {},
         onDeleteButtonClick = {}
     )
 }

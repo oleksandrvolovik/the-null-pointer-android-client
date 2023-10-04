@@ -58,6 +58,13 @@ class MainActivity : ComponentActivity() {
                             val shareIntent = Intent.createChooser(sendIntent, null)
                             startActivity(shareIntent)
                         },
+                        onOpenButtonClick = {
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                data = Uri.parse(it.link)
+                            }
+
+                            startActivity(intent)
+                        },
                         onDeleteButtonClick = {
                             fileDeletionDialogOpen.value = true
                             fileToBeDeleted.value = it
