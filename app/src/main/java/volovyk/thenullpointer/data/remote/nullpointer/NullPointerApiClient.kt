@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import volovyk.thenullpointer.BuildConfig
 
 object NullPointerApiClient {
     val client: Retrofit
@@ -14,7 +15,7 @@ object NullPointerApiClient {
                 .addInterceptor(interceptor)
                 .build()
             return Retrofit.Builder()
-                .baseUrl("https://0x0.st/")
+                .baseUrl(BuildConfig.NULL_POINTER_API_BASE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(client)
                 .build()
