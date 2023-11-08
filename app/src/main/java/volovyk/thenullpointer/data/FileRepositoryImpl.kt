@@ -20,43 +20,38 @@ class FileRepositoryImpl(
 
     private val uploadedFileDao = uploadedFileDatabase.getUploadedFileDao()
 
-    override fun getFilesFlow(): Flow<List<UploadedFile>> =
-        uploadedFileDao.getAll()
+    override fun getFilesFlow(): Flow<List<UploadedFile>> = uploadedFileDao.getAll()
 
     override suspend fun uploadFile(
         filename: String,
         fileSize: Long,
         inputStream: InputStream,
         mediaType: MediaType
-    ): Flow<FileUploadState> {
-        return withContext(Dispatchers.IO) {
-            val fileUploadState =
-                fileDatabase.uploadFile(filename, fileSize, inputStream, mediaType)
+    ): Flow<FileUploadState> = withContext(Dispatchers.IO) {
 
-            val realFileUploadState = fileUploadState.onEach {
-                if (it is FileUploadState.Success) {
-                    val uploadedFile = UploadedFile(
-                        filename,
-                        it.token,
-                        it.url,
-                        Date(),
-                        it.expiresAt
-                    )
+        val fileUploadState = fileDatabase.uploadFile(filename, fileSize, inputStream, mediaType)
 
-                    uploadedFileDao.insert(uploadedFile)
-                }
-            }.flowOn(Dispatchers.IO)
+        val realFileUploadState = fileUploadState.onEach {
+            if (it is FileUploadState.Success) {
+                val uploadedFile = UploadedFile(
+                    filename,
+                    it.token,
+                    it.url,
+                    Date(),
+                    it.expiresAt
+                )
 
-            realFileUploadState
-        }
+                uploadedFileDao.insert(uploadedFile)
+            }
+        }.flowOn(Dispatchers.IO)
+
+        return@withContext realFileUploadState
     }
 
-    override suspend fun deleteFile(file: UploadedFile) {
-        withContext(Dispatchers.IO) {
-            uploadedFileDao.delete(file)
-            file.token?.let {
-                fileDatabase.deleteFile(file.link, it)
-            }
+    override suspend fun deleteFile(file: UploadedFile): Unit = withContext(Dispatchers.IO) {
+        uploadedFileDao.delete(file)
+        file.token?.let {
+            fileDatabase.deleteFile(file.link, it)
         }
     }
 }
