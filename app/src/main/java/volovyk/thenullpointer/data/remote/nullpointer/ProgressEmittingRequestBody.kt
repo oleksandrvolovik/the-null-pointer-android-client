@@ -38,7 +38,6 @@ class ProgressEmittingRequestBody(
                 val progress = (((uploaded / fileSize.toDouble())) * 100).toInt()
                 _progress.update { progress }
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {

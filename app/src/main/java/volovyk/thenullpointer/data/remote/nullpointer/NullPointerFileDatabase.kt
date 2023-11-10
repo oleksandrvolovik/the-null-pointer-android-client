@@ -2,6 +2,7 @@ package volovyk.thenullpointer.data.remote.nullpointer
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
@@ -17,9 +18,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.Date
 
-
 class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerApiInterface) :
     FileDatabase {
+
+    private val uploadCoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun uploadFile(
         filename: String,
@@ -30,7 +32,7 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
         try {
             val requestFile = ProgressEmittingRequestBody(fileSize, inputStream, mediaType)
 
-            val progressJob = CoroutineScope(Dispatchers.IO).launch {
+            val progressJob = uploadCoroutineScope.launch {
                 requestFile.progress.takeWhile { it <= ProgressEmittingRequestBody.MAX_PROGRESS }
                     .collect {
                         send(FileUploadState.InProgress(filename, it))
@@ -76,21 +78,9 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
 
             send(FileUploadState.Success(filename, fullFileUrl, fileToken, fileExpiresAt))
         } catch (e: IOException) {
-            send(
-                FileUploadState.Failure(
-                    filename,
-                    null,
-                    e
-                )
-            )
+            send(FileUploadState.Failure(filename, null, e))
         } catch (e: RuntimeException) {
-            send(
-                FileUploadState.Failure(
-                    filename,
-                    null,
-                    e
-                )
-            )
+            send(FileUploadState.Failure(filename, null, e))
         }
     }.flowOn(Dispatchers.IO)
 
