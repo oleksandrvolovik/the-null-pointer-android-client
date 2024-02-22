@@ -3,19 +3,21 @@ package volovyk.thenullpointer.ui.filelist
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import volovyk.thenullpointer.data.entity.UploadedFile
 import java.util.Date
 
 @Composable
 fun FileList(
+    modifier: Modifier = Modifier,
     files: List<UploadedFile>,
     onItemClick: (UploadedFile) -> Unit,
     onItemShareButtonClick: (UploadedFile) -> Unit,
     onItemOpenButtonClick: (UploadedFile) -> Unit,
     onItemDeleteButtonClick: (UploadedFile) -> Unit
 ) {
-    LazyColumn {
+    LazyColumn(modifier = modifier) {
         items(files) { file ->
             FileListItem(
                 file = file,

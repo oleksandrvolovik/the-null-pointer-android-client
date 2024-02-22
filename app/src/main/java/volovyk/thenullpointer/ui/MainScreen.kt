@@ -1,11 +1,9 @@
 package volovyk.thenullpointer.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import volovyk.thenullpointer.data.entity.UploadedFile
@@ -25,29 +23,28 @@ fun MainScreen(
     onUploadFileFabClick: () -> Unit,
     onFileUploadStateClick: (FileUploadState) -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.SpaceBetween) {
-        Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f).fillMaxWidth()) {
-            // Display files
-            Box(modifier = Modifier.weight(1f)) {
-                FileList(
-                    files = uiState.files,
-                    onItemClick = onFileClick,
-                    onItemShareButtonClick = onShareButtonClick,
-                    onItemOpenButtonClick = onOpenButtonClick,
-                    onItemDeleteButtonClick = onDeleteButtonClick
-                )
-            }
-
-            // Display "Upload file" FAB
+    Scaffold(
+        bottomBar = {
+            FileUploadStateList(
+                fileUploadStates = uiState.fileUploadState,
+                onItemClick = onFileUploadStateClick
+            )
+        },
+        floatingActionButton = {
             UploadFileFab(
                 onClick = onUploadFileFabClick
             )
         }
-
-        // Display file upload states
-        FileUploadStateList(
-            fileUploadStates = uiState.fileUploadState,
-            onItemClick = onFileUploadStateClick
+    ) { padding ->
+        FileList(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxWidth(),
+            files = uiState.files,
+            onItemClick = onFileClick,
+            onItemShareButtonClick = onShareButtonClick,
+            onItemOpenButtonClick = onOpenButtonClick,
+            onItemDeleteButtonClick = onDeleteButtonClick
         )
     }
 }
