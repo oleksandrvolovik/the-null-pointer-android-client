@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.entity.UploadedFile
-import volovyk.thenullpointer.ui.getDaysDifference
+import volovyk.thenullpointer.util.getDaysDifference
 import java.util.Date
 
 @OptIn(ExperimentalFoundationApi::class)
