@@ -32,7 +32,9 @@ import androidx.compose.ui.unit.dp
 import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.util.getDaysDifference
+import java.text.DateFormat
 import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -92,8 +94,14 @@ fun FileListItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                val dateFormat = remember {
+                    DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault())
+                }
                 Text(
-                    text = stringResource(id = R.string.uploaded_at, file.uploadedAt),
+                    text = stringResource(
+                        id = R.string.uploaded_at,
+                        dateFormat.format(file.uploadedAt)
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
