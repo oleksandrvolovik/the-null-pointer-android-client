@@ -56,10 +56,10 @@ fun MainScreenPreview() {
         MainScreen(
             MainUiState(
                 files = listOf(
-                    UploadedFile("File1.pdf", null, "link", Date(), Date()),
-                    UploadedFile("File2.docx", null, "link", Date(), Date()),
-                    UploadedFile("File3.jpg", null, "link", Date(), Date()),
-                    UploadedFile("File4.avi", null, "link", Date(), Date())
+                    UploadedFile("File1.pdf", null, "link1", Date(), Date()),
+                    UploadedFile("File2.docx", null, "link2", Date(), Date()),
+                    UploadedFile("File3.jpg", null, "link3", Date(), Date()),
+                    UploadedFile("File4.avi", null, "link4", Date(), Date())
                 ), fileUploadState = listOf(
                     FileUploadState.Success("file5.mp4", "", "", Date()),
                     FileUploadState.InProgress("file6.mp3", 67),

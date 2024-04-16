@@ -11,7 +11,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,16 +27,14 @@ import java.util.Date
 @Composable
 fun FileUploadStateListItem(
     fileUploadState: FileUploadState,
-    onClick: (FileUploadState) -> Unit
+    onClick: (FileUploadState) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+        modifier = modifier,
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
-        shape = MaterialTheme.shapes.medium,
         onClick = { onClick(fileUploadState) }
     ) {
         Column(
@@ -109,14 +106,17 @@ fun FileUploadStateListItem(
 fun FileUploadStateListItemPreview() {
     Column {
         FileUploadStateListItem(
+            modifier = Modifier.padding(8.dp),
             fileUploadState = FileUploadState.Success("file123.xyz", "", "", Date()),
             onClick = {}
         )
         FileUploadStateListItem(
+            modifier = Modifier.padding(8.dp),
             fileUploadState = FileUploadState.InProgress("file456.xyz", 67),
             onClick = {}
         )
         FileUploadStateListItem(
+            modifier = Modifier.padding(8.dp),
             fileUploadState = FileUploadState.Failure("file789.xyz", "Something failed!", null),
             onClick = {}
         )

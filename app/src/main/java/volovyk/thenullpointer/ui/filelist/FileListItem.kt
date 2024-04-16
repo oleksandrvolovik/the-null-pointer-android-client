@@ -41,13 +41,12 @@ fun FileListItem(
     onClick: (UploadedFile) -> Unit,
     onShareButtonClick: (UploadedFile) -> Unit,
     onOpenButtonClick: (UploadedFile) -> Unit,
-    onDeleteButtonClick: (UploadedFile) -> Unit
+    onDeleteButtonClick: (UploadedFile) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var contextMenuExpanded by remember { mutableStateOf(false) }
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+        modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .combinedClickable(
                 onClick = { onClick(file) },
