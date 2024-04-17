@@ -4,10 +4,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -63,14 +67,36 @@ fun FileListItem(
             onDismissRequest = { contextMenuExpanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.open_in_browser)) },
+                text = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(R.string.open_in_browser))
+                        Spacer(Modifier.width(8.dp))
+                        Icon(
+                            painter = painterResource(R.drawable.ic_open),
+                            contentDescription = stringResource(R.string.open_in_browser)
+                        )
+                    }
+                },
                 onClick = {
                     onOpenButtonClick(file)
                     contextMenuExpanded = false
                 }
             )
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.delete)) },
+                text = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(R.string.delete))
+                        Spacer(Modifier.width(8.dp))
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete)
+                        )
+                    }
+                },
                 onClick = {
                     onDeleteButtonClick(file)
                     contextMenuExpanded = false
