@@ -1,5 +1,6 @@
 package volovyk.thenullpointer.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -68,4 +69,10 @@ fun MainScreenPreview() {
             ), {}, {}, {}, {}, {}, {}
         )
     }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+fun MainScreenPreviewDarkTheme() {
+    MainScreenPreview()
 }

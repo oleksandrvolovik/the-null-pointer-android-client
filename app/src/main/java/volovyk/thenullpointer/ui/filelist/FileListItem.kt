@@ -1,5 +1,6 @@
 package volovyk.thenullpointer.ui.filelist
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.entity.UploadedFile
+import volovyk.thenullpointer.ui.theme.AppTheme
 import volovyk.thenullpointer.util.getDaysDifference
 import java.text.DateFormat
 import java.util.Date
@@ -71,7 +73,10 @@ fun FileListItem(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(stringResource(R.string.open_in_browser))
+                        Text(
+                            text = stringResource(R.string.open_in_browser),
+                            color = LocalContentColor.current
+                        )
                         Spacer(Modifier.width(8.dp))
                         Icon(
                             painter = painterResource(R.drawable.ic_open),
@@ -89,7 +94,10 @@ fun FileListItem(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(stringResource(R.string.delete))
+                        Text(
+                            text = stringResource(R.string.delete),
+                            color = LocalContentColor.current
+                        )
                         Spacer(Modifier.width(8.dp))
                         Icon(
                             Icons.Default.Delete,
@@ -118,7 +126,8 @@ fun FileListItem(
                     text = file.name,
                     style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = LocalContentColor.current
                 )
                 val dateFormat = remember {
                     DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault())
@@ -130,7 +139,8 @@ fun FileListItem(
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = LocalContentColor.current
                 )
                 Text(
                     text = stringResource(
@@ -139,7 +149,8 @@ fun FileListItem(
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = LocalContentColor.current
                 )
             }
             IconButton(onClick = { onShareButtonClick(file) }) {
@@ -156,13 +167,21 @@ fun FileListItem(
 @Composable
 @Preview(showBackground = true)
 fun FileListItemPreview() {
-    FileListItem(
-        file = UploadedFile(
-            "file123.xyz", null, "", Date(), Date()
-        ),
-        onClick = {},
-        onShareButtonClick = {},
-        onOpenButtonClick = {},
-        onDeleteButtonClick = {}
-    )
+    AppTheme {
+        FileListItem(
+            file = UploadedFile(
+                "file123.xyz", null, "", Date(), Date()
+            ),
+            onClick = {},
+            onShareButtonClick = {},
+            onOpenButtonClick = {},
+            onDeleteButtonClick = {}
+        )
+    }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+fun FileListItemPreviewDarkTheme() {
+    FileListItemPreview()
 }
