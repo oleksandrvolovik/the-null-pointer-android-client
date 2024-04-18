@@ -8,7 +8,7 @@ import java.io.InputStream
 
 interface FileRepository {
     fun getFilesFlow(): Flow<List<UploadedFile>>
-    suspend fun uploadFile(
+    fun uploadFile(
         filename: String,
         fileSize: Long,
         inputStream: InputStream,

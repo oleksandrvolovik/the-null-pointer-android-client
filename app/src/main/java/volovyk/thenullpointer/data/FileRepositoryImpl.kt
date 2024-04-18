@@ -22,31 +22,25 @@ class FileRepositoryImpl(
 
     override fun getFilesFlow(): Flow<List<UploadedFile>> = uploadedFileDao.getAll()
 
-    override suspend fun uploadFile(
+    override fun uploadFile(
         filename: String,
         fileSize: Long,
         inputStream: InputStream,
         mediaType: MediaType
-    ): Flow<FileUploadState> = withContext(Dispatchers.IO) {
-
-        val fileUploadState = fileDatabase.uploadFile(filename, fileSize, inputStream, mediaType)
-
-        val realFileUploadState = fileUploadState.onEach {
+    ): Flow<FileUploadState> = fileDatabase.uploadFile(filename, fileSize, inputStream, mediaType)
+        .onEach {
             if (it is FileUploadState.Success) {
-                val uploadedFile = UploadedFile(
-                    filename,
-                    it.token,
-                    it.url,
-                    Date(),
-                    it.expiresAt
+                uploadedFileDao.insert(
+                    UploadedFile(
+                        filename,
+                        it.token,
+                        it.url,
+                        Date(),
+                        it.expiresAt
+                    )
                 )
-
-                uploadedFileDao.insert(uploadedFile)
             }
         }.flowOn(Dispatchers.IO)
-
-        return@withContext realFileUploadState
-    }
 
     override suspend fun deleteFile(file: UploadedFile): Unit = withContext(Dispatchers.IO) {
         uploadedFileDao.delete(file)
