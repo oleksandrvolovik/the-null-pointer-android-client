@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MediaType
 import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.entity.UploadedFile
-import volovyk.thenullpointer.data.remote.entity.FileUploadState
+import volovyk.thenullpointer.data.entity.FileUploadState
 import volovyk.thenullpointer.ui.theme.AppTheme
 import volovyk.thenullpointer.util.getFileName
 import volovyk.thenullpointer.util.length

@@ -1,4 +1,4 @@
-package volovyk.thenullpointer.data.remote.entity
+package volovyk.thenullpointer.data.entity
 
 import java.util.Date
 

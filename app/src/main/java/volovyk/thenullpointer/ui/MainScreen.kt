@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import volovyk.thenullpointer.data.entity.UploadedFile
-import volovyk.thenullpointer.data.remote.entity.FileUploadState
+import volovyk.thenullpointer.data.entity.FileUploadState
 import volovyk.thenullpointer.ui.filelist.FileList
 import volovyk.thenullpointer.ui.fileuploadstatelist.FileUploadStateList
 import volovyk.thenullpointer.ui.theme.AppTheme

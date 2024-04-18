@@ -13,7 +13,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import timber.log.Timber
 import volovyk.thenullpointer.data.remote.FileDatabase
-import volovyk.thenullpointer.data.remote.entity.FileUploadState
+import volovyk.thenullpointer.data.entity.FileUploadState
 import java.io.IOException
 import java.io.InputStream
 import java.util.Date

@@ -3,7 +3,7 @@ package volovyk.thenullpointer.data
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MediaType
 import volovyk.thenullpointer.data.entity.UploadedFile
-import volovyk.thenullpointer.data.remote.entity.FileUploadState
+import volovyk.thenullpointer.data.entity.FileUploadState
 import java.io.InputStream
 
 interface FileRepository {

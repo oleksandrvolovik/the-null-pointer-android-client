@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import volovyk.thenullpointer.R
-import volovyk.thenullpointer.data.remote.entity.FileUploadState
+import volovyk.thenullpointer.data.entity.FileUploadState
 import volovyk.thenullpointer.ui.theme.AppTheme
 import java.util.Date
 
