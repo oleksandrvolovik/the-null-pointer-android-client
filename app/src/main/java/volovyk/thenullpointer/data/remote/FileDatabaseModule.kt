@@ -4,7 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import volovyk.thenullpointer.data.remote.nullpointer.NullPointerApiClient
+import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
+import volovyk.thenullpointer.BuildConfig
 import volovyk.thenullpointer.data.remote.nullpointer.NullPointerApiInterface
 import volovyk.thenullpointer.data.remote.nullpointer.NullPointerFileDatabase
 import javax.inject.Singleton
@@ -14,8 +16,17 @@ import javax.inject.Singleton
 object FileDatabaseModule {
     @Provides
     @Singleton
-    fun provideApiInterface(): NullPointerApiInterface {
-        return NullPointerApiClient.client.create(NullPointerApiInterface::class.java)
+    fun provideRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.NULL_POINTER_API_BASE_URL)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApiInterface(retrofit: Retrofit): NullPointerApiInterface {
+        return retrofit.create(NullPointerApiInterface::class.java)
     }
 
     @Provides
