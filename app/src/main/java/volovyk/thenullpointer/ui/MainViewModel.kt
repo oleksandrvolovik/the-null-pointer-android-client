@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
 import timber.log.Timber
 import volovyk.thenullpointer.data.FileRepository
 import volovyk.thenullpointer.data.entity.UploadedFile
@@ -43,10 +42,10 @@ class MainViewModel @Inject constructor(private val fileRepository: FileReposito
         filename: String,
         fileSize: Long,
         inputStream: InputStream,
-        mediaType: MediaType
+        mimeType: String
     ) {
         viewModelScope.launch {
-            fileRepository.uploadFile(filename, fileSize, inputStream, mediaType)
+            fileRepository.uploadFile(filename, fileSize, inputStream, mimeType)
                 .collect { fileUploadState ->
                     Timber.d("New file upload state: $fileUploadState")
                     fileUploadStateMap[filename] = fileUploadState

@@ -64,7 +64,7 @@ fun MainScreenPreview() {
                 ), fileUploadState = listOf(
                     FileUploadState.Success("file5.mp4", "", "", Date()),
                     FileUploadState.InProgress("file6.mp3", 67),
-                    FileUploadState.Failure("file7.png", "Something went wrong!", null)
+                    FileUploadState.Failure("file7.png", null)
                 )
             ), {}, {}, {}, {}, {}, {}
         )

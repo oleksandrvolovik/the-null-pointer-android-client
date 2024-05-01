@@ -12,14 +12,16 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import timber.log.Timber
-import volovyk.thenullpointer.data.remote.FileDatabase
 import volovyk.thenullpointer.data.entity.FileUploadState
+import volovyk.thenullpointer.data.remote.FileDatabase
+import volovyk.thenullpointer.data.remote.model.FileDatabaseException
 import java.io.IOException
 import java.io.InputStream
 import java.util.Date
 
-class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerApiInterface) :
-    FileDatabase {
+class NullPointerFileDatabase(
+    private val nullPointerApiInterface: NullPointerApiInterface
+) : FileDatabase {
 
     private val uploadCoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -27,9 +29,21 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
         filename: String,
         fileSize: Long,
         inputStream: InputStream,
-        mediaType: MediaType
+        mimeType: String
     ): Flow<FileUploadState> = channelFlow {
         try {
+            val mediaType = MediaType.parse(mimeType)
+
+            if (mediaType == null) {
+                send(
+                    FileUploadState.Failure(
+                        filename,
+                        FileDatabaseException.UnsupportedMimeTypeException
+                    )
+                )
+                return@channelFlow
+            }
+
             val requestFile = ProgressEmittingRequestBody(fileSize, inputStream, mediaType)
 
             val progressJob = uploadCoroutineScope.launch {
@@ -53,24 +67,20 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
             Timber.d("URL - $fullFileUrl\nToken - $fileToken\nExpires at - $fileExpiresAt")
 
             if (response.code() == 415) {
-                val exception = IOException("415 Unsupported Media Type")
                 send(
                     FileUploadState.Failure(
                         filename,
-                        "This media type is unsupported",
-                        exception
+                        FileDatabaseException.UnsupportedMimeTypeException
                     )
                 )
                 return@channelFlow
             }
 
             if (fileUrl == null || fileExpiresAt == null) {
-                val exception = IOException("Server response is not complete")
                 send(
                     FileUploadState.Failure(
                         filename,
-                        "Server response is not complete",
-                        exception
+                        FileDatabaseException.UnsuccessfulRequestException()
                     )
                 )
                 return@channelFlow
@@ -78,9 +88,19 @@ class NullPointerFileDatabase(private val nullPointerApiInterface: NullPointerAp
 
             send(FileUploadState.Success(filename, fullFileUrl, fileToken, fileExpiresAt))
         } catch (e: IOException) {
-            send(FileUploadState.Failure(filename, null, e))
+            send(
+                FileUploadState.Failure(
+                    filename,
+                    FileDatabaseException.UnsuccessfulRequestException(e)
+                )
+            )
         } catch (e: RuntimeException) {
-            send(FileUploadState.Failure(filename, null, e))
+            send(
+                FileUploadState.Failure(
+                    filename,
+                    FileDatabaseException.UnsuccessfulRequestException(e)
+                )
+            )
         }
     }.flowOn(Dispatchers.IO)
 

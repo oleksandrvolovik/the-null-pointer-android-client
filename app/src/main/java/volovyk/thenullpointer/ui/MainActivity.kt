@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
-import okhttp3.MediaType
 import volovyk.thenullpointer.R
 import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.data.entity.FileUploadState
@@ -112,15 +111,15 @@ class MainActivity : ComponentActivity() {
             val filename = fileUri.getFileName(contentResolver)
             val fileSize = fileUri.length(contentResolver)
             val fileInputStream = contentResolver.openInputStream(fileUri)
-            val mediaType = contentResolver.getType(fileUri)?.let { MediaType.parse(it) }
+            val mimeType = contentResolver.getType(fileUri)
 
-            if (filename != null && fileInputStream != null && mediaType != null) {
+            if (filename != null && fileInputStream != null && mimeType != null) {
                 if (filename !in viewModel.uiState.value.fileUploadState.map { it.filename }) {
                     viewModel.uploadFile(
                         filename,
                         fileSize,
                         fileInputStream,
-                        mediaType
+                        mimeType
                     )
                 } else {
                     Toast.makeText(this, R.string.file_already_being_uploaded, Toast.LENGTH_SHORT)

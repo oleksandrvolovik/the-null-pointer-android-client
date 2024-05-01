@@ -18,4 +18,5 @@
     <string name="link_in_clipboard">Link copied to clipboard!</string>
     <string name="delete">Delete</string>
     <string name="open_in_browser">Open in Browser</string>
+    <string name="file_type_not_supported">This file type is not supported!</string>
 </resources>

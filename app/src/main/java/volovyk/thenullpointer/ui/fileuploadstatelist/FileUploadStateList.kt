@@ -45,7 +45,7 @@ fun FileUploadStateListPreview() {
         fileUploadStates = listOf(
             FileUploadState.Success("file123.xyz", "", "", Date()),
             FileUploadState.InProgress("file456.xyz", 67),
-            FileUploadState.Failure("file789.xyz", "Something failed!", null)
+            FileUploadState.Failure("file789.xyz", null)
         ),
         onItemClick = {}
     )

@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import volovyk.thenullpointer.R
+import volovyk.thenullpointer.data.entity.FileRepositoryException
 import volovyk.thenullpointer.data.entity.FileUploadState
 import volovyk.thenullpointer.ui.theme.AppTheme
 import java.util.Date
@@ -93,7 +94,12 @@ fun FileUploadStateListItem(
                         text = stringResource(
                             id = R.string.file_upload_failure,
                             fileUploadState.filename,
-                            fileUploadState.message ?: stringResource(R.string.common_error_message)
+                            when (fileUploadState.error) {
+                                is FileRepositoryException.UnsupportedFileTypeException ->
+                                    stringResource(R.string.file_type_not_supported)
+
+                                else -> stringResource(R.string.common_error_message)
+                            }
                         ),
                         fontSize = 16.sp,
                         color = Color.Red
@@ -121,7 +127,7 @@ fun FileUploadStateListItemPreview() {
             )
             FileUploadStateListItem(
                 modifier = Modifier.padding(8.dp),
-                fileUploadState = FileUploadState.Failure("file789.xyz", "Something failed!", null),
+                fileUploadState = FileUploadState.Failure("file789.xyz", null),
                 onClick = {}
             )
         }

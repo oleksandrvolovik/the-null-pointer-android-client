@@ -17,7 +17,6 @@ sealed class FileUploadState(open val filename: String) {
 
     data class Failure(
         override val filename: String,
-        val message: String?,
         val error: Throwable?
     ) : FileUploadState(filename)
 }

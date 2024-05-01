@@ -1,7 +1,6 @@
 package volovyk.thenullpointer.data.remote
 
 import kotlinx.coroutines.flow.Flow
-import okhttp3.MediaType
 import volovyk.thenullpointer.data.entity.FileUploadState
 import java.io.InputStream
 
@@ -10,7 +9,7 @@ interface FileDatabase {
         filename: String,
         fileSize: Long,
         inputStream: InputStream,
-        mediaType: MediaType
+        mimeType: String
     ): Flow<FileUploadState>
 
     fun deleteFile(
