@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
 import volovyk.thenullpointer.R
-import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.data.entity.FileUploadState
+import volovyk.thenullpointer.data.entity.UploadedFile
 import volovyk.thenullpointer.ui.theme.AppTheme
 import volovyk.thenullpointer.util.getFileName
 import volovyk.thenullpointer.util.length
@@ -34,6 +34,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            handleIntent(intent)
+        }
         setContent {
             AppTheme {
                 // A surface container using the 'background' color from the theme
@@ -104,10 +107,25 @@ class MainActivity : ComponentActivity() {
         Toast.makeText(this, R.string.link_in_clipboard, Toast.LENGTH_SHORT).show()
     }
 
+    private fun handleIntent(intent: Intent) {
+        if (intent.action == Intent.ACTION_SEND || intent.action == Intent.ACTION_SEND_MULTIPLE) {
+            val clipData = intent.clipData
+            if (clipData != null && clipData.itemCount > 0) {
+                val clipDataUris = mutableListOf<Uri>()
+                for (i in 0 until clipData.itemCount) {
+                    clipDataUris.add(clipData.getItemAt(i)!!.uri)
+                }
+                uploadFiles(clipDataUris)
+            }
+        }
+    }
+
     private val openDocumentLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenMultipleDocuments()
-    ) { files: List<Uri> ->
-        files.forEach { fileUri ->
+        ActivityResultContracts.OpenMultipleDocuments(), ::uploadFiles
+    )
+
+    private fun uploadFiles(fileUris: List<Uri>) {
+        fileUris.forEach { fileUri ->
             val filename = fileUri.getFileName(contentResolver)
             val fileSize = fileUri.length(contentResolver)
             val fileInputStream = contentResolver.openInputStream(fileUri)
@@ -123,6 +141,7 @@ class MainActivity : ComponentActivity() {
                     )
                 } else {
                     Toast.makeText(this, R.string.file_already_being_uploaded, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
